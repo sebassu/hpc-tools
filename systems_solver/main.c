@@ -1,6 +1,6 @@
-//#include <lapacke.h>
+// #include <lapacke.h>
 #include <openblas/lapacke.h>
-//#include <mkl_lapacke.h>
+// #include <mkl_lapacke.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -12,50 +12,39 @@
 double *generate_matrix(unsigned int size, unsigned int seed)
 {
   unsigned int i;
-  double *matrix = (double *) malloc(sizeof(double) * size * size);
-
+  double *matrix = (double *)malloc(sizeof(double) * size * size);
   srand(seed);
-
-  for (i = 0; i < size * size; i++) {
+  for (i = 0; i < size * size; i++)
     matrix[i] = rand() % 100;
-  }
-
   return matrix;
 }
 
 double *duplicate_matrix(double *orig, unsigned int size)
 {
-  double *replica = (double *) malloc(sizeof(double) * size * size);
-
-  memcpy((void *) replica, (void *) orig, size * size * sizeof(double));
-
+  double *replica = (double *)malloc(sizeof(double) * size * size);
+  memcpy((void *)replica, (void *)orig, size * size * sizeof(double));
   return replica;
 }
 
 int is_nearly_equal(double x, double y)
 {
-  const double epsilon = 1e-5 /* some small number */;
-  return fabs(x - y) <= epsilon * fabs(x);
-  // see Knuth section 4.2.2 pages 217-218
+  return fabs(x - y) <= EPSILON * fabs(x);
 }
 
 unsigned int check_result(double *bref, double *b, unsigned int size)
 {
   unsigned int i;
-
-  for(i = 0; i < size*size; i++) {
+  for (i = 0; i < size * size; i++)
     if (!is_nearly_equal(bref[i], b[i]))
       return 0;
-  }
-
   return 1;
 }
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
+  if (argc < 2)
+  {
     printf("You need to provide a matrix size (e.g. 1024 for use 1024x1024 matrices)\n");
-
     return 1;
   }
 
@@ -69,12 +58,11 @@ int main(int argc, char *argv[])
   aref = duplicate_matrix(a, size);
   bref = duplicate_matrix(b, size);
 
-
   //
   // Using LAPACK dgesv OpenBLAS implementation to solve the system
   //
   int n = size, nrhs = size, lda = size, ldb = size, info;
-  int *ipiv = (int *) malloc(sizeof(int) * size);
+  int *ipiv = (int *)malloc(sizeof(int) * size);
 
   timeinfo start, now;
   timestamp(&start);
@@ -83,7 +71,6 @@ int main(int argc, char *argv[])
 
   timestamp(&now);
   printf("Time taken by Lapacke dgesv: %ld ms\n", diff_milli(&start, &now));
-
 
   //
   // Using your own solver based on Gauss or Gauss-Jordan elimination
@@ -96,7 +83,7 @@ int main(int argc, char *argv[])
   printf("Time taken by my dgesv solver: %ld ms\n", diff_milli(&start, &now));
 
   if (check_result(bref, b, size) == 1)
-    printf("Result is ok!\n");
+    printf("Result is OK!\n");
   else
     printf("Result is wrong!\n");
 
