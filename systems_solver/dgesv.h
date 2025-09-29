@@ -1,4 +1,4 @@
-const double EPSILON = 1e-5;
+#define EPSILON 1e-5
 
 int my_dgesv(int n, int nrhs, double *a, double *b);
 int find_pivot_row(double *matrix, int n, int current_column);

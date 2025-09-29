@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "dgesv.h"
 
 int my_dgesv(int n, int nrhs, double *a, double *b)

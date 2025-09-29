@@ -1,13 +1,11 @@
-// #include <lapacke.h>
+#include <math.h>
 #include <openblas/lapacke.h>
-// #include <mkl_lapacke.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
-#include <unistd.h>
-#include "timer.h"
+
 #include "dgesv.h"
+#include "timer.h"
 
 double *generate_matrix(unsigned int size, unsigned int seed)
 {
