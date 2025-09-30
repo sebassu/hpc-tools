@@ -7,7 +7,7 @@ int my_dgesv(int n, int nrhs, double *a, double *b)
   for (int current = 0; current < n; current += 1)
   {
     int pivot_row = find_pivot_row(a, n, current);
-    if (fabs(a[current * n + pivot_row]) < EPSILON)
+    if (fabs(a[pivot_row * n + current]) < EPSILON)
       return current + 1;
     if (pivot_row != current)
       swap_rows(current, pivot_row, a, b, n, nrhs);
@@ -23,7 +23,7 @@ int find_pivot_row(double *matrix, int n, int position)
   double maximum = fabs(matrix[position * n + position]);
   for (int row = position + 1; row < n; row += 1)
   {
-    double value = fabs(matrix[position * n + row]);
+    double value = fabs(matrix[row * n + position]);
     if (value > maximum)
     {
       maximum = value;
@@ -37,16 +37,15 @@ void swap_rows(int row1, int row2, double *matrix, double *rhs, int n, int nrhs)
 {
   for (int column = 0; column < n; column += 1)
   {
-    double aux = matrix[column * n + row1];
-    matrix[column * n + row1] = matrix[column * n + row2];
-    matrix[column * n + row2] = aux;
+    double aux = matrix[row1 * n + column];
+    matrix[row1 * n + column] = matrix[row2 * n + column];
+    matrix[row2 * n + column] = aux;
   }
-
   for (int rhs_column = 0; rhs_column < nrhs; rhs_column += 1)
   {
-    double aux = rhs[rhs_column * n + row1];
-    rhs[rhs_column * n + row1] = rhs[rhs_column * n + row2];
-    rhs[rhs_column * n + row2] = aux;
+    double aux = rhs[row1 * nrhs + rhs_column];
+    rhs[row1 * nrhs + rhs_column] = rhs[row2 * nrhs + rhs_column];
+    rhs[row2 * nrhs + rhs_column] = aux;
   }
 }
 
@@ -54,9 +53,9 @@ void normalize_pivot_row(double *matrix, double *rhs, int n, int nrhs, int pivot
 {
   double pivot_element = matrix[pivot * n + pivot];
   for (int column = pivot; column < n; column += 1)
-    matrix[column * n + pivot] /= pivot_element;
+    matrix[pivot * n + column] /= pivot_element;
   for (int rhs_column = 0; rhs_column < nrhs; rhs_column += 1)
-    rhs[rhs_column * n + pivot] /= pivot_element;
+    rhs[pivot * nrhs + rhs_column] /= pivot_element;
 }
 
 void eliminate_column(double *matrix, double *rhs, int n, int nrhs, int pivot)
@@ -65,10 +64,10 @@ void eliminate_column(double *matrix, double *rhs, int n, int nrhs, int pivot)
   {
     if (row == pivot)
       continue;
-    double factor = matrix[pivot * n + row];
+    double factor = matrix[row * n + pivot];
     for (int column = pivot; column < n; column += 1)
-      matrix[column * n + row] -= factor * matrix[column * n + pivot];
+      matrix[row * n + column] -= factor * matrix[pivot * n + column];
     for (int rhs_column = 0; rhs_column < nrhs; rhs_column += 1)
-      rhs[rhs_column * n + row] -= factor * rhs[rhs_column * n + pivot];
+      rhs[row * nrhs + rhs_column] -= factor * rhs[pivot * nrhs + rhs_column];
   }
 }
